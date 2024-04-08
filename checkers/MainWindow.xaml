@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:checkers"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
+    <Grid Background="#FF2DAB0F">
+        <Button Content="Click me!" Margin="290,124,305,230" />
     </Grid>
 </Window>

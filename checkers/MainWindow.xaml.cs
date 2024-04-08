@@ -23,6 +23,8 @@ namespace checkers
         public MainWindow()
         {
             InitializeComponent();
+            Game game = new Game();
+            game.Show();
         }
     }
 }
