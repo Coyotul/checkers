@@ -5,24 +5,38 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:checkers"
         mc:Ignorable="d"
-        Title="Game" Height="1000" Width="1200">
+        Title="Game" Height="800" Width="1200">
     <Window.DataContext>
         <local:GameViewModel/>
     </Window.DataContext>
 
-    <Grid Name ="Checkerboard"  Background="#FF1E870F" Width="800" Margin="0,0,400,0">
+    <Grid Name="Checkerboard" Background="#FF1E870F" Width="800" Height="800" Margin="0,0,400,0">
+        <Grid Name="Table" Background="#FF1E870F" Width="800" Height="800" Margin="0,0,0,0">
+
+        </Grid>
         <ItemsControl ItemsSource="{Binding Board.Pieces}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Image Width="100" Height="100" 
+                           Source="{Binding ImagePath}"
+                           Margin="{Binding Margin}" 
+                           Panel.ZIndex="1"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <!-- Adăugare dreptunghiuri ca fiind copii ai ItemsControl-ului -->
+            <ItemsControl.ItemContainerStyle>
+                <Style TargetType="ContentPresenter">
+                    <Setter Property="Canvas.Left" Value="{Binding XPos}" />
+                    <Setter Property="Canvas.Top" Value="{Binding YPos}" />
+                </Style>
+            </ItemsControl.ItemContainerStyle>
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Canvas />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Image Source="{Binding ImagePath}" Width="100" Height="100" 
-                       Canvas.Left="{Binding XPos}" Canvas.Top="{Binding YPos}" />
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
         </ItemsControl>
+        
     </Grid>
+
 </Window>

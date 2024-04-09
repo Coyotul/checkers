@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace checkers
 {
@@ -14,6 +15,8 @@ namespace checkers
         private float _xPos;
         private float _yPos;
         private string _imagePath;
+        private Thickness _margin;
+
 
 
         public bool IsKing
@@ -68,6 +71,20 @@ namespace checkers
             }
         }
 
+        public string ImagePath
+        {
+            get { return _imagePath; }
+            set
+            {
+                if (_imagePath != value)
+                {
+                    _imagePath = value;
+                    OnPropertyChanged(nameof(ImagePath));
+                }
+            }
+        }
+
+
         public Piece(bool isKing, bool isRedPiece, float xPos, float yPos)
         {
             IsKing = isKing;
@@ -77,11 +94,24 @@ namespace checkers
             YPos = yPos;
             if (isRedPiece)
             {
-                _imagePath = "/red.png";
+                _imagePath = "red.png";
             }
             else
             {
-                _imagePath = "/white.png";
+                _imagePath = "white.png";
+            }
+        }
+
+        public Thickness Margin
+        {
+            get { return _margin; }
+            set
+            {
+                if (_margin != value)
+                {
+                    _margin = value;
+                    OnPropertyChanged(nameof(Margin));
+                }
             }
         }
 

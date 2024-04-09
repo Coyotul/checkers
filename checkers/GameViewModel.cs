@@ -21,10 +21,12 @@ namespace checkers
             }
         }
 
+       
         public GameViewModel()
         {
             Board = new BoardManager();
         }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)

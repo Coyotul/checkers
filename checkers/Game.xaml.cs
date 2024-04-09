@@ -11,6 +11,7 @@ namespace checkers
         {
             InitializeComponent();
             CreateTable();
+            this.DataContext = new GameViewModel();
         }
 
 
@@ -43,11 +44,10 @@ namespace checkers
             }
 
             rectangle.Margin = new Thickness(column * 100, row * 100, 800 - ((column + 1) * 100), 800 - ((row + 1) * 100) - rectangle.Height+100);
-
             Grid.SetRow(rectangle, row);
             Grid.SetColumn(rectangle, column);
-
-            Checkerboard.Children.Add(rectangle);
+            Grid.SetZIndex(rectangle, 100);
+            Table.Children.Add(rectangle);
         }
 
     }
