@@ -55,6 +55,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MovePoint.cs" />
+    <Compile Include="RelayCommand.cs" />
     <Page Include="Game.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -118,6 +120,11 @@
     <Resource Include="red_king.png" />
     <Resource Include="white.png" />
     <Resource Include="white_king.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="movePoint1.png" />
+    <Resource Include="movePoint2.png" />
+    <Resource Include="movePoint3.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

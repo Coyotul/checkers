@@ -25,6 +25,7 @@ namespace checkers
             InitializeComponent();
             Game game = new Game();
             game.Show();
+            this.Hide();
         }
     }
 }

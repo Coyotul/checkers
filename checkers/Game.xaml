@@ -20,10 +20,13 @@
                     <Image Width="100" Height="100" 
                            Source="{Binding ImagePath}"
                            Margin="{Binding Margin}" 
-                           Panel.ZIndex="1"/>
+                           Panel.ZIndex="1">
+                        <Image.InputBindings>
+                            <MouseBinding Gesture="LeftClick" Command="{Binding ClickCommand}" />
+                        </Image.InputBindings>
+                    </Image>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
-            <!-- Adăugare dreptunghiuri ca fiind copii ai ItemsControl-ului -->
             <ItemsControl.ItemContainerStyle>
                 <Style TargetType="ContentPresenter">
                     <Setter Property="Canvas.Left" Value="{Binding XPos}" />
@@ -36,7 +39,31 @@
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>
-        
+        <ItemsControl ItemsSource="{Binding Board.MovePoints}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Image Width="100" Height="100" 
+                   Source="{Binding ImagePath}"
+                   Margin="{Binding Margin}" 
+                   Panel.ZIndex="1">
+                        <Image.InputBindings>
+                            <MouseBinding Gesture="LeftClick" Command="{Binding ClickCommand}" />
+                        </Image.InputBindings>
+                    </Image>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemContainerStyle>
+                <Style TargetType="ContentPresenter">
+                    <Setter Property="Canvas.Left" Value="{Binding XPos}" />
+                    <Setter Property="Canvas.Top" Value="{Binding YPos}" />
+                </Style>
+            </ItemsControl.ItemContainerStyle>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
     </Grid>
 
 </Window>

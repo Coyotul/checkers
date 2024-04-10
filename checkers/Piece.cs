@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace checkers
 {
@@ -16,8 +17,19 @@ namespace checkers
         private float _yPos;
         private string _imagePath;
         private Thickness _margin;
+        public event EventHandler PieceClicked;
+        public int index;
 
-
+        private ICommand _clickCommand;
+        public ICommand ClickCommand
+        {
+            get { return _clickCommand; }
+            set
+            {
+                _clickCommand = value;
+                OnPropertyChanged(nameof(ClickCommand));
+            }
+        }
 
         public bool IsKing
         {
@@ -87,6 +99,8 @@ namespace checkers
 
         public Piece(bool isKing, bool isRedPiece, float xPos, float yPos)
         {
+            ClickCommand = new RelayCommand(ExecuteClickCommand, CanExecuteClickCommand);
+
             IsKing = isKing;
             IsRedPiece = isRedPiece;
             XPos = xPos;
@@ -100,6 +114,16 @@ namespace checkers
             {
                 _imagePath = "white.png";
             }
+        }
+
+        private void ExecuteClickCommand(object parameter)
+        {
+            PieceClicked?.Invoke(this, EventArgs.Empty);
+        }
+
+        private bool CanExecuteClickCommand(object parameter)
+        {
+            return true; 
         }
 
         public Thickness Margin

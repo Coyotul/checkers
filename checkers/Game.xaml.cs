@@ -45,6 +45,7 @@ namespace checkers
 
             rectangle.Margin = new Thickness(column * 100, row * 100, 800 - ((column + 1) * 100), 800 - ((row + 1) * 100) - rectangle.Height+100);
             Grid.SetRow(rectangle, row);
+            //rectangle.Opacity = 0.5;
             Grid.SetColumn(rectangle, column);
             Grid.SetZIndex(rectangle, 100);
             Table.Children.Add(rectangle);
