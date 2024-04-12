@@ -12,6 +12,7 @@ namespace checkers
     public class GameViewModel : INotifyPropertyChanged
     {
         private BoardManager _board;
+        private Players _players;
         public ICommand ClickCommand { get; private set; }
 
 
@@ -25,10 +26,21 @@ namespace checkers
             }
         }
 
+        public Players Players
+        {
+            get { return _players; }
+            set
+            {
+                _players = value;
+                OnPropertyChanged(nameof(Players));
+            }
+        }
+
 
         public GameViewModel()
         {
-            Board = new BoardManager();
+            Players = new Players();
+            Board = new BoardManager(Players);
             ClickCommand = new RelayCommand(ExecuteClickCommand);
         }
 

@@ -15,6 +15,7 @@ namespace checkers
         public List<Piece> _pieces;
         public List<MovePoint> _movePoints;
         private int _pickedPiece;
+        private Players _players;
 
         public List<Piece> Pieces
         {
@@ -35,9 +36,20 @@ namespace checkers
             }
         }
 
-        public BoardManager()
+        public Players Players
+        {
+            get { return _players; }
+            set
+            {
+                _players = value;
+                OnPropertyChanged(nameof(Players));
+            }
+        }
+
+        public BoardManager(Players players)
         {
             InitializeTable();
+            _players = players;
         }
         public async Task InitializeTable()
         {
@@ -77,26 +89,29 @@ namespace checkers
 
         private void OnPieceClicked(object sender, EventArgs e)
         {
-            if(sender.GetType() == typeof(Piece))
+            if (sender.GetType() == typeof(Piece))
             {
                 Piece piece = (Piece)sender;
-                if (piece.IsRedPiece)
-                {
+                bool isPlayer1Turn = _players.IsPlayer1;
 
+                if ((!isPlayer1Turn && piece.IsRedPiece))
+                {
+                    Players.ChangePlayer();
                     double leftMargin = piece.Margin.Left;
                     double topMargin = piece.Margin.Top;
-                    Thickness margin = new Thickness(leftMargin+100, topMargin+100, 0, 0);
+                    Thickness margin = new Thickness(leftMargin + 100, topMargin + 100, 0, 0);
                     MovePoint movePoint = new MovePoint(piece.XPos + 1, piece.YPos - 1) { Margin = margin };
                     movePoint.MovePointClicked += OnMovePointClicked;
                     _movePoints.Add(movePoint);
-                    margin = new Thickness(leftMargin-100, topMargin + 100, 0, 0);
+                    margin = new Thickness(leftMargin - 100, topMargin + 100, 0, 0);
                     MovePoint movePoint2 = new MovePoint(piece.XPos + 1, piece.YPos - 1) { Margin = margin };
                     movePoint2.MovePointClicked += OnMovePointClicked;
                     _movePoints.Add(movePoint2);
                     _pickedPiece = piece.index;
                 }
-                else
+                else if ((isPlayer1Turn && !piece.IsRedPiece))
                 {
+                    Players.ChangePlayer();
                     double leftMargin = piece.Margin.Left;
                     double topMargin = piece.Margin.Top;
                     Thickness margin = new Thickness(leftMargin + 100, topMargin - 100, 0, 0);
