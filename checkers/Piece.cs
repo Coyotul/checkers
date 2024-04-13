@@ -39,6 +39,7 @@ namespace checkers
                 if (_isKing != value)
                 {
                     _isKing = value;
+                    _imagePath = IsRedPiece ? "red_king.png" : "white_king.png";
                     OnPropertyChanged(nameof(IsKing));
                 }
             }
