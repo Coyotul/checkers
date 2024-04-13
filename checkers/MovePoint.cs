@@ -13,6 +13,9 @@ namespace checkers
     {
         public float _xPos { get; set; }
         public float _yPos { get; set; }
+        public bool _canEliminate { get; set; }
+        public float _eliminatedX { get; set; } 
+        public float _eliminatedY { get; set; }
         private string _imagePath;
         private Thickness _margin;
         public event EventHandler MovePointClicked;
