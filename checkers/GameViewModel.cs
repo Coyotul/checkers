@@ -36,11 +36,10 @@ namespace checkers
             }
         }
 
-
         public GameViewModel()
         {
             Players = new Players();
-            Board = new BoardManager(Players);
+            Board = new BoardManager(Players, true);
             ClickCommand = new RelayCommand(ExecuteClickCommand);
         }
 

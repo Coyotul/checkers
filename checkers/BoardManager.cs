@@ -19,9 +19,11 @@ namespace checkers
         private int _pickedPiece;
         private Players _players;
         private Piece _piece;
-        public bool _canDoubleJump = false;
+        public bool _canDoubleJump = true;
         private int _player1Wins = 0;
         private int _player2Wins = 0;
+        private bool _playerJumped = false;
+        private bool _playerCanEliminateAgain = false;
 
         public List<Piece> Pieces
         {
@@ -52,9 +54,10 @@ namespace checkers
             }
         }
 
-        public BoardManager(Players players)
+        public BoardManager(Players players, bool canDoubleJump)
         {
             InitializeTable();
+            _canDoubleJump = canDoubleJump;
             _players = players;
         }
         public async Task InitializeTable()
@@ -103,7 +106,6 @@ namespace checkers
                 bool isPlayer1Turn = _players.IsPlayer1;
                 _movePoints.Clear();
                 MovePoints = _movePoints.ToList();
-
                 if ((!isPlayer1Turn && piece.IsRedPiece))
                 {
                     CreateMovePoints(piece);
@@ -113,6 +115,8 @@ namespace checkers
                     CreateMovePoints(piece);
                 }
                 MovePoints = _movePoints.ToList();
+                _playerCanEliminateAgain = CanPieceEliminateAgain(piece);
+
             }
         }
 
@@ -127,14 +131,14 @@ namespace checkers
                 // Verificare și adăugare pentru locul din dreapta sus
                 if (piece.XPos + 1 <= 7 && piece.YPos + 1 <= 7)
                 {
-                    if (isPlaceFree(piece.XPos + 1, piece.YPos + 1))
+                    if (isPlaceFree(piece.XPos + 1, piece.YPos + 1) && _playerJumped == false)
                     {
                         Thickness margin = new Thickness(leftMargin + 100, topMargin + 100, 0, 0);
                         MovePoint movePoint = new MovePoint(piece.XPos + 1, piece.YPos + 1) { Margin = margin };
                         movePoint.MovePointClicked += OnMovePointClicked;
                         _movePoints.Add(movePoint);
                     }
-                    else if (piece.XPos + 2 <= 7 && piece.YPos + 2 <= 7 && isPlaceFree(piece.XPos + 2, piece.YPos + 2) && !isPlaceFree(piece.XPos + 1, piece.YPos + 1))
+                    else if (piece.XPos + 2 <= 7 && piece.YPos + 2 <= 7 && isPlaceFree(piece.XPos + 2, piece.YPos + 2) && !isPlaceFree(piece.XPos + 1, piece.YPos + 1) && piece.IsRedPiece != IsPieceRed(piece.XPos + 1, piece.YPos+1))
                     {
                         Thickness margin = new Thickness(leftMargin + 200, topMargin + 200, 0, 0);
                         MovePoint movePoint = new MovePoint(piece.XPos + 2, piece.YPos + 2) { Margin = margin };
@@ -148,14 +152,14 @@ namespace checkers
                 // Verificare și adăugare pentru locul din stânga sus
                 if (piece.XPos - 1 >= 0 && piece.YPos + 1 <= 7)
                 {
-                    if (isPlaceFree(piece.XPos - 1, piece.YPos + 1))
+                    if (isPlaceFree(piece.XPos - 1, piece.YPos + 1) && _playerJumped == false)
                     {
                         Thickness margin = new Thickness(leftMargin - 100, topMargin + 100, 0, 0);
                         MovePoint movePoint = new MovePoint(piece.XPos - 1, piece.YPos + 1) { Margin = margin };
                         movePoint.MovePointClicked += OnMovePointClicked;
                         _movePoints.Add(movePoint);
                     }
-                    else if (piece.XPos - 2 >= 0 && piece.YPos + 2 <= 7 && isPlaceFree(piece.XPos - 2, piece.YPos + 2) && !isPlaceFree(piece.XPos - 1, piece.YPos + 1))
+                    else if (piece.XPos - 2 >= 0 && piece.YPos + 2 <= 7 && isPlaceFree(piece.XPos - 2, piece.YPos + 2) && !isPlaceFree(piece.XPos - 1, piece.YPos + 1) && piece.IsRedPiece != IsPieceRed(piece.XPos - 1, piece.YPos+1))
                     {
                         Thickness margin = new Thickness(leftMargin - 200, topMargin + 200, 0, 0);
                         MovePoint movePoint = new MovePoint(piece.XPos - 2, piece.YPos + 2) { Margin = margin };
@@ -170,14 +174,14 @@ namespace checkers
                 // Verificare și adăugare pentru locul din dreapta jos
                 if (piece.XPos + 1 <= 7 && piece.YPos - 1 >= 0)
                 {
-                    if (isPlaceFree(piece.XPos + 1, piece.YPos - 1))
+                    if (isPlaceFree(piece.XPos + 1, piece.YPos - 1) && _playerJumped == false)
                     {
                         Thickness margin = new Thickness(leftMargin + 100, topMargin - 100, 0, 0);
                         MovePoint movePoint = new MovePoint(piece.XPos + 1, piece.YPos - 1) { Margin = margin };
                         movePoint.MovePointClicked += OnMovePointClicked;
                         _movePoints.Add(movePoint);
                     }
-                    else if (piece.XPos + 2 <= 7 && piece.YPos - 2 >= 0 && isPlaceFree(piece.XPos + 2, piece.YPos - 2) && !isPlaceFree(piece.XPos + 1, piece.YPos - 1))
+                    else if (piece.XPos + 2 <= 7 && piece.YPos - 2 >= 0 && isPlaceFree(piece.XPos + 2, piece.YPos - 2) && !isPlaceFree(piece.XPos + 1, piece.YPos - 1) && piece.IsRedPiece != IsPieceRed(piece.XPos + 1, piece.YPos-1))
                     {
                         Thickness margin = new Thickness(leftMargin + 200, topMargin - 200, 0, 0);
                         MovePoint movePoint = new MovePoint(piece.XPos + 2, piece.YPos - 2) { Margin = margin };
@@ -191,14 +195,14 @@ namespace checkers
                 // Verificare și adăugare pentru locul din stânga jos
                 if (piece.XPos - 1 >= 0 && piece.YPos - 1 >= 0)
                 {
-                    if (isPlaceFree(piece.XPos - 1, piece.YPos - 1))
+                    if (isPlaceFree(piece.XPos - 1, piece.YPos - 1) && _playerJumped == false)
                     {
                         Thickness margin = new Thickness(leftMargin - 100, topMargin - 100, 0, 0);
                         MovePoint movePoint = new MovePoint(piece.XPos - 1, piece.YPos - 1) { Margin = margin };
                         movePoint.MovePointClicked += OnMovePointClicked;
                         _movePoints.Add(movePoint);
                     }
-                    else if (piece.XPos - 2 >= 0 && piece.YPos - 2 >= 0 && isPlaceFree(piece.XPos - 2, piece.YPos - 2) && !isPlaceFree(piece.XPos - 1, piece.YPos - 1))
+                    else if (piece.XPos - 2 >= 0 && piece.YPos - 2 >= 0 && isPlaceFree(piece.XPos - 2, piece.YPos - 2) && !isPlaceFree(piece.XPos - 1, piece.YPos - 1) && piece.IsRedPiece != IsPieceRed(piece.XPos - 1, piece.YPos-1))
                     {
                         Thickness margin = new Thickness(leftMargin - 200, topMargin - 200, 0, 0);
                         MovePoint movePoint = new MovePoint(piece.XPos - 2, piece.YPos - 2) { Margin = margin };
@@ -215,14 +219,14 @@ namespace checkers
                 // Verificare și adăugare pentru locul din dreapta sus
                 if (piece.XPos + 1 <= 7 && piece.YPos + 1 <= 7)
                 {
-                    if (isPlaceFree(piece.XPos + 1, piece.YPos + 1))
+                    if (isPlaceFree(piece.XPos + 1, piece.YPos + 1) && _playerJumped == false)
                     {
                         Thickness margin = new Thickness(leftMargin + 100, topMargin + 100, 0, 0);
                         MovePoint movePoint = new MovePoint(piece.XPos + 1, piece.YPos + 1) { Margin = margin };
                         movePoint.MovePointClicked += OnMovePointClicked;
                         _movePoints.Add(movePoint);
                     }
-                    else if (piece.XPos + 2 <= 7 && piece.YPos + 2 <= 7 && isPlaceFree(piece.XPos + 2, piece.YPos + 2) && !isPlaceFree(piece.XPos + 1, piece.YPos + 1))
+                    else if (piece.XPos + 2 <= 7 && piece.YPos + 2 <= 7 && isPlaceFree(piece.XPos + 2, piece.YPos + 2) && !isPlaceFree(piece.XPos + 1, piece.YPos + 1) && piece.IsRedPiece != IsPieceRed(piece.XPos + 1, piece.YPos+1))
                     {
                         Thickness margin = new Thickness(leftMargin + 200, topMargin + 200, 0, 0);
                         MovePoint movePoint = new MovePoint(piece.XPos + 2, piece.YPos + 2) { Margin = margin };
@@ -236,14 +240,14 @@ namespace checkers
                 // Verificare și adăugare pentru locul din stânga sus
                 if (piece.XPos - 1 >= 0 && piece.YPos + 1 <= 7)
                 {
-                    if (isPlaceFree(piece.XPos - 1, piece.YPos + 1))
+                    if (isPlaceFree(piece.XPos - 1, piece.YPos + 1) && _playerJumped == false)
                     {
                         Thickness margin = new Thickness(leftMargin - 100, topMargin + 100, 0, 0);
                         MovePoint movePoint = new MovePoint(piece.XPos - 1, piece.YPos + 1) { Margin = margin };
                         movePoint.MovePointClicked += OnMovePointClicked;
                         _movePoints.Add(movePoint);
                     }
-                    else if (piece.XPos - 2 >= 0 && piece.YPos + 2 <= 7 && isPlaceFree(piece.XPos - 2, piece.YPos + 2) && !isPlaceFree(piece.XPos - 1, piece.YPos + 1))
+                    else if (piece.XPos - 2 >= 0 && piece.YPos + 2 <= 7 && isPlaceFree(piece.XPos - 2, piece.YPos + 2) && !isPlaceFree(piece.XPos - 1, piece.YPos + 1) && piece.IsRedPiece != IsPieceRed(piece.XPos - 1, piece.YPos+1))
                     {
                         Thickness margin = new Thickness(leftMargin - 200, topMargin + 200, 0, 0);
                         MovePoint movePoint = new MovePoint(piece.XPos - 2, piece.YPos + 2) { Margin = margin };
@@ -260,14 +264,14 @@ namespace checkers
                 // Verificare și adăugare pentru locul din dreapta jos
                 if (piece.XPos + 1 <= 7 && piece.YPos - 1 >= 0)
                 {
-                    if (isPlaceFree(piece.XPos + 1, piece.YPos - 1))
+                    if (isPlaceFree(piece.XPos + 1, piece.YPos - 1) && _playerJumped == false)
                     {
                         Thickness margin = new Thickness(leftMargin + 100, topMargin - 100, 0, 0);
                         MovePoint movePoint = new MovePoint(piece.XPos + 1, piece.YPos - 1) { Margin = margin };
                         movePoint.MovePointClicked += OnMovePointClicked;
                         _movePoints.Add(movePoint);
                     }
-                    else if (piece.XPos + 2 <= 7 && piece.YPos - 2 >= 0 && isPlaceFree(piece.XPos + 2, piece.YPos - 2) && !isPlaceFree(piece.XPos + 1, piece.YPos - 1))
+                    else if (piece.XPos + 2 <= 7 && piece.YPos - 2 >= 0 && isPlaceFree(piece.XPos + 2, piece.YPos - 2) && !isPlaceFree(piece.XPos + 1, piece.YPos - 1) && piece.IsRedPiece != IsPieceRed(piece.XPos + 1, piece.YPos - 1))
                     {
                         Thickness margin = new Thickness(leftMargin + 200, topMargin - 200, 0, 0);
                         MovePoint movePoint = new MovePoint(piece.XPos + 2, piece.YPos - 2) { Margin = margin };
@@ -281,14 +285,14 @@ namespace checkers
                 // Verificare și adăugare pentru locul din stânga jos
                 if (piece.XPos - 1 >= 0 && piece.YPos - 1 >= 0)
                 {
-                    if (isPlaceFree(piece.XPos - 1, piece.YPos - 1))
+                    if (isPlaceFree(piece.XPos - 1, piece.YPos - 1) && _playerJumped == false)
                     {
                         Thickness margin = new Thickness(leftMargin - 100, topMargin - 100, 0, 0);
                         MovePoint movePoint = new MovePoint(piece.XPos - 1, piece.YPos - 1) { Margin = margin };
                         movePoint.MovePointClicked += OnMovePointClicked;
                         _movePoints.Add(movePoint);
                     }
-                    else if (piece.XPos - 2 >= 0 && piece.YPos - 2 >= 0 && isPlaceFree(piece.XPos - 2, piece.YPos - 2) && !isPlaceFree(piece.XPos - 1, piece.YPos - 1))
+                    else if (piece.XPos - 2 >= 0 && piece.YPos - 2 >= 0 && isPlaceFree(piece.XPos - 2, piece.YPos - 2) && !isPlaceFree(piece.XPos - 1, piece.YPos - 1) && piece.IsRedPiece != IsPieceRed(piece.XPos - 1, piece.YPos-1))
                     {
                         Thickness margin = new Thickness(leftMargin - 200, topMargin - 200, 0, 0);
                         MovePoint movePoint = new MovePoint(piece.XPos - 2, piece.YPos - 2) { Margin = margin };
@@ -302,6 +306,18 @@ namespace checkers
             }
 
         }
+
+        private bool IsPieceRed(float x, float y)
+        {
+            foreach (Piece piece in _pieces)
+            {
+                if (piece.XPos == x && piece.YPos == y)
+                {
+                    return piece.IsRedPiece;
+                }
+            }
+            return false;
+        }   
 
         private void SetPieceAsKing(Piece piece)
         {
@@ -379,6 +395,95 @@ namespace checkers
             return true;
         }
 
+        private bool CanPieceEliminateAgain(Piece piece)
+        {
+            foreach (MovePoint movePoint in _movePoints)
+            {
+                if (movePoint._canEliminate)
+                {
+                    // Verificăm dacă piesa este regină
+                    if (piece.IsKing)
+                    {
+                        // Verificare și adăugare pentru locul din dreapta sus
+                        if (movePoint.XPos + 1 <= 7 && movePoint.YPos + 1 <= 7)
+                        {
+                            if (movePoint.XPos + 2 <= 7 && movePoint.YPos + 2 <= 7 && isPlaceFree(movePoint.XPos + 2, movePoint.YPos + 2) && !isPlaceFree(movePoint.XPos + 1, movePoint.YPos + 1) && piece.IsRedPiece != IsPieceRed(movePoint.XPos + 1, movePoint.YPos + 1))
+                            {
+                                return true;
+                            }
+                        }
+                        // Verificare și adăugare pentru locul din stânga sus
+                        if (movePoint.XPos - 1 >= 0 && movePoint.YPos + 1 <= 7)
+                        {
+                            if (movePoint.XPos - 2 >= 0 && movePoint.YPos + 2 <= 7 && isPlaceFree(movePoint.XPos - 2, movePoint.YPos + 2) && !isPlaceFree(movePoint.XPos - 1, movePoint.YPos + 1) && piece.IsRedPiece != IsPieceRed(movePoint.XPos - 1, movePoint.YPos + 1))
+                            {
+                                return true;
+                            }
+                        }
+                        // Verificare și adăugare pentru locul din dreapta jos
+                        if (movePoint.XPos + 1 <= 7 && movePoint.YPos - 1 >= 0)
+                        {
+                            if (movePoint.XPos + 2 <= 7 && movePoint.YPos - 2 >= 0 && isPlaceFree(movePoint.XPos + 2, movePoint.YPos - 2) && !isPlaceFree(movePoint.XPos + 1, movePoint.YPos - 1) && piece.IsRedPiece != IsPieceRed(movePoint.XPos + 1, movePoint.YPos - 1))
+                            {
+                                return true;
+                            }
+                        }
+                        // Verificare și adăugare pentru locul din stânga jos
+                        if (movePoint.XPos - 1 >= 0 && movePoint.YPos - 1 >= 0)
+                        {
+                            if (movePoint.XPos - 2 >= 0 && movePoint.YPos - 2 >= 0 && isPlaceFree(movePoint.XPos - 2, movePoint.YPos - 2) && !isPlaceFree(movePoint.XPos - 1, movePoint.YPos - 1) && piece.IsRedPiece != IsPieceRed(movePoint.XPos - 1, movePoint.YPos - 1))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    else // Piesa nu este regină
+                    {
+                        // Verificăm direcțiile posibile de eliminare în funcție de culoarea piesei
+                        if (piece.IsRedPiece)
+                        {
+                            // Verificare și adăugare pentru locul din dreapta sus
+                            if (movePoint.XPos + 1 <= 7 && movePoint.YPos + 1 <= 7)
+                            {
+                                if (movePoint.XPos + 2 <= 7 && movePoint.YPos + 2 <= 7 && isPlaceFree(movePoint.XPos + 2, movePoint.YPos + 2) && !isPlaceFree(movePoint.XPos + 1, movePoint.YPos + 1) && piece.IsRedPiece != IsPieceRed(movePoint.XPos + 1, movePoint.YPos + 1))
+                                {
+                                    return true;
+                                }
+                            }
+                            // Verificare și adăugare pentru locul din stânga sus
+                            if (movePoint.XPos - 1 >= 0 && movePoint.YPos + 1 <= 7)
+                            {
+                                if (movePoint.XPos - 2 >= 0 && movePoint.YPos + 2 <= 7 && isPlaceFree(movePoint.XPos - 2, movePoint.YPos + 2) && !isPlaceFree(movePoint.XPos - 1, movePoint.YPos + 1) && piece.IsRedPiece != IsPieceRed(movePoint.XPos - 1, movePoint.YPos + 1))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                        else // Piesa este albă
+                        {
+                            // Verificare și adăugare pentru locul din dreapta jos
+                            if (movePoint.XPos + 1 <= 7 && movePoint.YPos - 1 >= 0)
+                            {
+                                if (movePoint.XPos + 2 <= 7 && movePoint.YPos - 2 >= 0 && isPlaceFree(movePoint.XPos + 2, movePoint.YPos - 2) && !isPlaceFree(movePoint.XPos + 1, movePoint.YPos - 1) && piece.IsRedPiece != IsPieceRed(movePoint.XPos + 1, movePoint.YPos - 1))
+                                {
+                                    return true;
+                                }
+                            }
+                            // Verificare și adăugare pentru locul din stânga jos
+                            if (movePoint.XPos - 1 >= 0 && movePoint.YPos - 1 >= 0)
+                            {
+                                if (movePoint.XPos - 2 >= 0 && movePoint.YPos - 2 >= 0 && isPlaceFree(movePoint.XPos - 2, movePoint.YPos - 2) && !isPlaceFree(movePoint.XPos - 1, movePoint.YPos - 1) && piece.IsRedPiece != IsPieceRed(movePoint.XPos - 1, movePoint.YPos - 1))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
         private void OnMovePointClicked(object sender, EventArgs e)
         {
             if (sender.GetType() == typeof(MovePoint))
@@ -387,13 +492,17 @@ namespace checkers
                 if (movePoint._canEliminate)
                 {
                     RemoveAPiece(movePoint._eliminatedX, movePoint._eliminatedY);
-                    if (!_canDoubleJump)
+                    if (!_canDoubleJump || _playerCanEliminateAgain == false)
                     {
                         Players.ChangePlayer();
+                        _playerJumped = false;
                     }
+                    else
+                        _playerJumped = true;
                 }
                 else
                 {
+                    _playerJumped = false;
                     Players.ChangePlayer();
                 }
 
